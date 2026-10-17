@@ -37,7 +37,7 @@ export async function createReplyApi({ postId, body, file, commentId }: { postId
     formData.append('image', file)
   }
   const res = await api.post(
-    `/posts/${postId}/comments/${commentId}/replies?page=1&limit=10`);
+    `/posts/${postId}/comments/${commentId}/replies?page=1&limit=10`,formData);
   return res.data;
 }
 

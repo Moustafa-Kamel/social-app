@@ -1,6 +1,7 @@
 import { Toaster } from 'react-hot-toast'
 import { Outlet } from 'react-router'
 import Navbar from '../Navbar/Navbar'
+import ScrollToTop from '../../ui/ScrollToTop/ScrollToTop'
 
 export default function MainLayout() {
     return (
@@ -12,6 +13,7 @@ export default function MainLayout() {
                 </main>
             </div>
             <Toaster />
+            <ScrollToTop />
         </div>
     )
 }

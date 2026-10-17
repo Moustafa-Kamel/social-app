@@ -1,31 +1,34 @@
-import { useEffect, useState } from "react";
 import LoadingSpinner from "../../../Components/ui/LoadingSpinner/LoadingSpinner";
-import AppPagintaion from "../../../Components/ui/AppPagination/AppPagination";
 import PostCard from "./PostCard/PostCard";
 import type { Posts } from "../posts.types";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {  useInfiniteQuery } from "@tanstack/react-query";
+import InfiniteScrollTrigger from "../../../Components/ui/InfiniteScrollTrigger/InfiniteScrollTrigger";
 
 type Props = {
   queryKey: string;
   fetcher: (page: number) => Promise<Posts>;
   emptyMessage?: string;
-  paginate?: boolean;
 };
 
-export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts found.", paginate = true }: Props) {
+export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts found." }: Props) {
 
-  const [page, setPage] = useState(1);
 
-  const { data, isPending, isError, isFetching, isPlaceholderData } = useQuery({
-    queryKey: ["posts", queryKey, page],
-    queryFn: () => fetcher(page),
-    placeholderData: keepPreviousData,
+  const { data, isPending, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+    queryKey: ["posts", queryKey],
+    queryFn: ({ pageParam }) => fetcher(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const p = lastPage.meta?.pagination;
+      return p && p.currentPage < p.numberOfPages ? p.currentPage + 1 : undefined;
+    },
   });
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page]);
-  const posts = data?.data?.posts ?? [];
-  const pagination = data?.meta?.pagination;
+
+  const posts = Array.from(
+    new Map(
+      (data?.pages ?? []).flatMap((page) => page.data.posts).map((post) => [post._id, post] as const)
+    ).values()
+  );
+
 
   if (isPending) return <LoadingSpinner />;
   if (isError) return <p className="py-8 text-center text-red-500">Failed to load posts</p>
@@ -33,22 +36,18 @@ export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts 
   return (
     <section className="space-y-4">
 
-
-      <div className={`space-y-4 transition-opacity ${isPlaceholderData ? "pointer-events-none opacity-50" : ""}`}>
-        {posts.length > 0
-          ? posts.map((post) => <PostCard post={post} key={post._id} />)
-          : <p className="py-8 text-center text-gray-500">{emptyMessage}</p>}
-      </div>
-
-      {paginate && pagination && pagination.numberOfPages > 1 &&  (
-        <AppPagintaion
-          itemsPerPage={pagination.limit}
-          page={page}
-          loading={isFetching}
-          setPage={setPage}
-          totalPages={pagination.numberOfPages}
-          totalItems={pagination.total}
-        />
+      {posts.length > 0 ? (
+        <>
+          {posts.map((post) => <PostCard post={post} key={post._id} />)}
+          <InfiniteScrollTrigger
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            onLoadMore={fetchNextPage}
+            endMessage="You're all caught up 🎉"
+          />
+        </>
+      ) : (
+        <p className="py-8 text-center text-gray-500">{emptyMessage}</p>
       )}
     </section>
   );

@@ -1,15 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {  useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { creatPostApi, deletePostApi, getPostDetailsApi, sharePostApi, toggleBookmarkApi, toggleLikePostApi, updatePostApi } from "./posts.api";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import toast from "react-hot-toast";
 export const onError = (e: unknown) => toast.error(getErrorMessage(e));
 
-// export const useFeed = (page: number) =>
-//   useQuery({
-//     queryKey: ["posts", "feed", page],
-//     queryFn: () => getAllPosts(page),
-//     placeholderData: keepPreviousData, // الصفحة القديمة تفضل ظاهرة لحد ما الجديدة تيجي
-//   });
 
 export const usePost = (id: string) =>
   useQuery({

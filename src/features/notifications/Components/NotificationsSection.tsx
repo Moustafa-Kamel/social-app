@@ -6,30 +6,28 @@ import NotificationsButtons from "./NotificationsButtons";
 import NotificationsList from "./NotificationsList";
 import { useMarkAllAsRead, useMarkAsRead, useNotifications } from "../notifications.hooks";
 import type { Notification } from "../notifications.types";
-import AppPaginataion from "../../../Components/ui/AppPagination/AppPagination";
+import InfiniteScrollTrigger from "../../../Components/ui/InfiniteScrollTrigger/InfiniteScrollTrigger";
 
 export default function NotificationsSection() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<"all" | "unread">("all");
-  const [page, setPage] = useState(1);
 
-  const { data, isPending, isError, isFetching } = useNotifications(page, filter === "unread");
+  const { data, isPending, isError,fetchNextPage,hasNextPage,isFetchingNextPage } = useNotifications(filter === "unread");
   const markAsRead = useMarkAsRead();
   const markAll = useMarkAllAsRead();
 
-  const all: Notification[] = data?.data.notifications ?? [];
 
-  const pagination = data?.meta?.pagination;
-  const notifications = filter === "unread" ? all.filter((n) => !n.isRead) : all;
+  const notifications = Array.from(
+    new Map(
+      (data?.pages ?? []).flatMap((page) => page.data.notifications).map((noti) => [noti._id, noti])
+    ).values()
+  )
   const handleItemClick = (n: Notification) => {
     if (!n.isRead) markAsRead.mutate(n._id);
     if (n.type === "follow" && n.actor) navigate(`/profile/${n.actor._id}`);
     else if (n.entity?._id) navigate(`/postDetails/${n.entity._id}`);
   };
-  const handleFilterChange = (f: "all" | "unread") => {
-    setFilter(f);
-    setPage(1); // رجّع لأول صفحة لما الفلتر يتغير
-  };
+
   return (
     <section className="rounded-xl border border-slate-200 bg-white shadow-sm sm:rounded-2xl">
       {/* Header & Filters */}
@@ -37,28 +35,23 @@ export default function NotificationsSection() {
         <NotificationHeader onMarkAllAsRead={() => markAll.mutate()} />
 
         {/* Filter Buttons */}
-        <NotificationsButtons onFilterChange={handleFilterChange} filter={filter} />
+        <NotificationsButtons onFilterChange={setFilter} filter={filter} />
       </div>
       {isPending ? (
         <LoadingSpinner />
       ) : isError ? (
         <p className="py-8 text-center text-sm text-red-500">Failed to load notifications</p>
       ) : (
-        <NotificationsList notifications={notifications} onItemClick={handleItemClick} 
-        emptyMessage={filter === "unread" ? "You're all caught up 🎉" : "No notifications yet."}/>
+        <NotificationsList notifications={notifications} onItemClick={handleItemClick}
+          emptyMessage={filter === "unread" ? "You're all caught up 🎉" : "No notifications yet."} />
       )}
-      {pagination && pagination.numberOfPages > 1 && (
-        <div className="p-3">
-          {pagination && pagination.numberOfPages > 1 && notifications.length > 0 &&<AppPaginataion
-            itemsPerPage={pagination.limit}
-            page={page}
-            loading={isFetching}
-            setPage={setPage}
-            totalPages={pagination.numberOfPages}
-            totalItems={pagination.total}
-          />}
-        </div>
-      )}
+      <InfiniteScrollTrigger
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={fetchNextPage}
+        endMessage="You're all caught up 🎉"
+      />
+
     </section>
   );
 }

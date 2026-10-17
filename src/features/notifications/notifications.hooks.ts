@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNotifications, getUnreadCount, markAllAsReadApi, markAsReaApi } from "./notifications.api";
 import { getErrorMessage } from "../../utils/getErrorMessage";
 import toast from "react-hot-toast";
@@ -9,12 +9,15 @@ export const useUnreadCount = (enabled: boolean) =>
         queryFn: getUnreadCount,
         refetchInterval: 30_000,enabled});
 
-export const useNotifications = (page: number, unread: boolean) =>
-  useQuery({
-    queryKey: ["notifications", "list", unread, page],
-    queryFn: () => getNotifications(page, 10, unread),
-    placeholderData: (prev, prevQuery) =>
-      prevQuery?.queryKey[2] === unread ? prev : undefined,
+export const useNotifications = ( unread: boolean) =>
+  useInfiniteQuery({    
+    queryKey: ["notifications", "list", unread],
+    queryFn: ({ pageParam }) => getNotifications(pageParam, 10, unread),
+     initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const p = lastPage.meta?.pagination;
+      return p && p.currentPage < p.numberOfPages ? p.currentPage + 1 : undefined;
+    },
   });
 
 export const useMarkAsRead = () => {
