@@ -30,18 +30,19 @@ export default function AppPagination({itemsPerPage, setPage, totalPages, totalI
     const endItem = Math.min(page * itemsPerPage, totalItems);
 
     return (
-        <Pagination className="flex justify-center items-center py-5 text-gray-300">
-            <Pagination.Summary className="text-sm">
+        <Pagination className="flex flex-wrap items-center justify-center gap-1 py-4 text-xs text-gray-400 w-full ">
+            <Pagination.Summary className="w-full text-center mb-2 text-xs text-gray-500">
                 Showing {startItem}-{endItem} of {totalItems} results
             </Pagination.Summary>
-            <Pagination.Content>
+            <Pagination.Content className="flex flex-wrap items-center justify-center gap-1 w-full">
                 <Pagination.Item>
                     <Pagination.Previous
                         isDisabled={page === 1 || loading}
                         onPress={() => setPage((p) => Math.max(p - 1, 1))}
+                        className="text-xs px-2 py-1 min-h-7"
                     >
                         <Pagination.PreviousIcon />
-                        <span>Previous</span>
+                        <span className="text-xs">Prev</span>
                     </Pagination.Previous>
                 </Pagination.Item>
 
@@ -55,6 +56,7 @@ export default function AppPagination({itemsPerPage, setPage, totalPages, totalI
                             <Pagination.Link
                                 isActive={p === page}
                                 onPress={() => setPage(p)}
+                                className="text-xs px-2 py-1 min-h-7"
                             >
                                 {p}
                             </Pagination.Link>
@@ -66,9 +68,10 @@ export default function AppPagination({itemsPerPage, setPage, totalPages, totalI
                     <Pagination.Next
                         isDisabled={page === totalPages || loading}
                         onPress={() => setPage((p) => Math.min(p + 1, totalPages))}
+                        className="text-xs w-7 h-7 min-w-7"
                     >
-                        <span>Next</span>
-                        <Pagination.NextIcon />
+                        <span className="text-xs">Next</span>
+                        <Pagination.NextIcon className="w-3.5 h-3.5"/>
                     </Pagination.Next>
                 </Pagination.Item>
             </Pagination.Content>

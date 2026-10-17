@@ -96,7 +96,7 @@ export default function Profile() {
               key={`posts-${user._id}`}
               queryKey={`user-${user._id}`}
               fetcher={(page) => getUserPosts(user._id, page)}
-              emptyMessage="No posts yet."
+             paginate={false} emptyMessage="No saved posts yet."
             />
           </>
         ) : (

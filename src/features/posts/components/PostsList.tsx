@@ -9,9 +9,10 @@ type Props = {
   queryKey: string;
   fetcher: (page: number) => Promise<Posts>;
   emptyMessage?: string;
+  paginate?: boolean;
 };
 
-export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts found." }: Props) {
+export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts found.", paginate = true }: Props) {
 
   const [page, setPage] = useState(1);
 
@@ -33,14 +34,13 @@ export default function PostsList({ queryKey, fetcher, emptyMessage = "No posts 
     <section className="space-y-4">
 
 
-      {/* {isPlaceholderData && <LoadingSpinner />} */}
       <div className={`space-y-4 transition-opacity ${isPlaceholderData ? "pointer-events-none opacity-50" : ""}`}>
         {posts.length > 0
           ? posts.map((post) => <PostCard post={post} key={post._id} />)
           : <p className="py-8 text-center text-gray-500">{emptyMessage}</p>}
       </div>
 
-      {pagination && pagination.numberOfPages > 1 && (
+      {paginate && pagination && pagination.numberOfPages > 1 &&  (
         <AppPagintaion
           itemsPerPage={pagination.limit}
           page={page}
