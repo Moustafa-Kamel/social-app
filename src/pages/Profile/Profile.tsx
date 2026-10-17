@@ -105,6 +105,7 @@ export default function Profile() {
             queryKey="saved"
             fetcher={getBookmarks}
             emptyMessage="No saved posts yet."
+            paginate={false}
           />
         )}
       </div>
