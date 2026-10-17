@@ -96,7 +96,6 @@ export default function Profile() {
               key={`posts-${user._id}`}
               queryKey={`user-${user._id}`}
               fetcher={(page) => getUserPosts(user._id, page)}
-             paginate={false} emptyMessage="No saved posts yet."
             />
           </>
         ) : (
@@ -105,7 +104,6 @@ export default function Profile() {
             queryKey="saved"
             fetcher={getBookmarks}
             emptyMessage="No saved posts yet."
-            paginate={false}
           />
         )}
       </div>
