@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getUserProfile } from "./profile.api";
+import { getMyProfile, getUserProfile } from "./profile.api";
 import { getBookmarks, getUserPosts } from "../posts/posts.api";
 import { uploadProfilePhoto } from "../../Components/layout/Navbar/NavbarPhoto.Services";
 import toast from "react-hot-toast";
 import { getErrorMessage } from "../../utils/getErrorMessage";
+import { useContext } from "react";
+import { UserAuthContext } from "../../app/providers/UserAuthProvider/UserAuthContext";
 
 export const useUserProfile = (id: string) =>
   useQuery({
@@ -12,12 +14,6 @@ export const useUserProfile = (id: string) =>
     enabled: !!id,
   })
 
-  // export const useUserPosts = (id: string) =>
-  // useQuery({
-  //   queryKey: ["users", "profile", id],
-  //   queryFn: () => getUserProfilePosts(id),
-  //   enabled: !!id,
-  // })
 export const useUserPostsCount = (userId: string) =>
   useQuery({
     queryKey: ["posts", "count", userId],
@@ -27,9 +23,12 @@ export const useUserPostsCount = (userId: string) =>
   });
   export const useUploadPhoto = () => {
   const qc = useQueryClient();
+  const { setUserData } = useContext(UserAuthContext);
   return useMutation({
     mutationFn: uploadProfilePhoto,
-    onSuccess: () => {
+    onSuccess:async () => {
+      const me = await getMyProfile();
+      setUserData((prev) => (prev ? { ...prev, photo: me.data.user.photo } : prev));
       toast.success("Profile photo updated");
       qc.invalidateQueries({ queryKey: ["users"] });
       qc.invalidateQueries({ queryKey: ["posts"] });

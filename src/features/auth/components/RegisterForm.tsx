@@ -26,7 +26,7 @@ export default function RegisterForm() {
             password: "",
             rePassword: ""
         },
-        mode: 'all',
+        mode: 'onTouched',
         resolver: zodResolver(registerSchema)
     })
 

@@ -1,7 +1,13 @@
-import * as zod from 'zod'
+import * as zod from "zod";
+
 export const loginSchema = zod.object({
-    email: zod.string().email('Email Is Required'),
-    password: zod.string().min(1,'password is requie').regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/, 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character'),
-})
+  email: zod
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email (e.g. name@example.com)"),
+  password: zod.string().min(1, "Password is required"),
+});
+
+export type LoginForm = zod.infer<typeof loginSchema>;
 //quwe@mailinator.com
 //Asd123456789#
