@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@theme {
+    --color-main-color: #2ccce4;
+}
+
+/* button {
+    background-color: transparent !important;
+} */
+.button--primary {
+    --button-bg: bg-white;
+    --button-bg-hover: var(--accent-hover);
+    --button-bg-pressed: var(--accent-hover);
+    --button-fg: var(--accent-foreground);
+}
+.yarl__slide_image {
+  max-width: 60vw;
+  max-height: 60vh;
+  object-fit: contain;
+}
+body{
+    font-family: var(--font-sans);
+    color: var(--color-slate-900);
+    background: #f0f2f5;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+#root {
+  width: 100%;
+}
