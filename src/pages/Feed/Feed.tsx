@@ -7,7 +7,7 @@ export default function Feed() {
   return (
   < >
   <CreatePost/>
-    <PostsList queryKey="home" fetcher={getHomeFeed}/>;
+    <PostsList queryKey="home" fetcher={getHomeFeed}/>
   </>
   )
 }
